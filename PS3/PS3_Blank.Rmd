@@ -1,0 +1,239 @@
+---
+title: "PHS 2000B Problem Set 3"
+subtitle: Interaction  (34 pts)
+date: "Due Thursday, February 20, 2025"
+output:
+  pdf_document: default
+  word_document: default
+header-includes:
+- \usepackage{graphicx}
+- \usepackage{amsmath}
+- \usepackage{comment}
+- \usepackage[utf8]{inputenc}
+- \usepackage{booktabs}
+- \usepackage[group-separator={,}]{siunitx}
+- \usepackage{adjustbox}
+- \usepackage{float}
+- \usepackage{pgf,tikz}
+- \usetikzlibrary{positioning}
+- \usetikzlibrary{shapes}
+- \usetikzlibrary{arrows.meta}
+- \usepackage{subcaption}
+- \definecolor{agreen}{rgb}{0.0, 0.5, 0.0}
+- \newcommand{\indep}{\perp \!\!\! \perp}
+---
+
+\newcommand{\independent}{\rotatebox[origin=c]{90}{$\models$}}
+
+```{r donotedit, include = FALSE}
+options(digits = 4, scipen = 4)
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(knitr, xtable, ggplot2, msm)
+knitr::opts_chunk$set(echo = T, tidy = T, cache = T, message = F, warning = F, fig.align = "center", fig.height = 3.5, fig.width = 5)
+options(xtable.comment = F, width = 90)
+```
+
+
+## Key concepts (15 pt)
+
+There is considerable evidence that smoking and exposure to air pollution both are independent causes of lung cancer. However, in Turner et al. 2014\footnote{Michelle C. Turner, Aaron Cohen, Michael Jerrett, Susan M. Gapstur, W. Ryan Diver, C. Arden Pope, Daniel Krewski, Bernardo S. Beckerman, Jonathan M. Samet, Interactions Between Cigarette Smoking and Fine Particulate Matter in the Risk of Lung Cancer Mortality in Cancer Prevention Study II, American Journal of Epidemiology, Volume 180, Issue 12, 15 December 2014, Pages 1145–1149, https://doi.org/10.1093/aje/kwu275}, the authors were interested in whether there may be a joint effect of smoking and air pollution on lung cancer mortality. Below is a modified reproduction of their Table 2 showing the raw data on rates of lung cancer death within strata of smoking status (current vs. never smoker) and exposure to air pollution ($PM_{2.5}$ exposure above 75th percentile vs. below 25th percentile).
+
+```{=tex}
+\begin{table}[h] \centering 
+\resizebox{\linewidth}{!}{
+\begin{tabular}{
+@{\extracolsep{15pt}} % extra spacing between columns. adjust according to preference.
+*6{S[table-format=1.2]} %6 columns, 2 decimal places
+@{}
+} 
+\toprule
+ & \multicolumn{2}{c}{Never Smoker} & \multicolumn{2}{c}{Current Smoker} \\
+ \cmidrule(lr){2-3} \cmidrule(lr){4-5}
+{$PM_{2.5}$ exposure} & {Deaths} & {No. Subjects} & {Deaths} & {No. Subjects} \\ 
+\midrule 
+{Low ($\leq$ 25th percentile)} & 63 & {76,025} & 346 & {31,486} \\ 
+{High ($\geq$ 75th percentile)} & 81 & {73,592} & 447 & {33,789} \\ 
+\bottomrule
+\end{tabular}
+}
+\end{table}
+```
+1.  Calculate an appropriate measure of interaction on the additive scale and **interpret**.  (2 pt)
+
+**Answer:**
+
+
+\vspace{1cm}
+
+2.  Calculate an appropriate measure of interaction on the multiplicative scale and **interpret**. (2 pt)
+
+
+**Answer:**
+
+\vspace{1cm}
+
+
+3.  Are your estimates of 1 and 2 similar or different? In general, when do you expect them to be similar and when do you expect them to be different? (2 pt)
+
+**Answer:**
+
+\vspace{1cm}
+
+
+4.  Calculate and **interpret** the RERI. (2 pt)
+
+
+**Answer:**
+
+
+\newpage
+
+
+5.  Using counterfactual notation, write out the causal effect implied when the authors mention interest in a joint effect of intervening on smoking and air pollution. Please define how we can see if there is additive or multiplicative interaction. (3 pt)
+
+
+**Answer:**
+
+
+\vspace{1cm}
+
+
+6. Turner and colleagues collected new data with the following underlying causal structure. $L$ is a binary measured variable and $U$ are unmeasured variables. What assumptions do you need to make to identify the joint effect of smoking $S$ and air pollution $A$ on lung cancer mortality $Y$ with this new data? Show how you \textit{could} estimate whether there is a causal interaction on the \textbf{multiplicative scale} using data and relevant assumptions (Hint: use the g-formula/standardization, following the steps shown in the lecture or lab). (4 pt)
+
+\begin{center}
+\begin{tikzpicture}
+      \node(a) {$A$};
+      \node[right = 1 of a] (y) {$Y$};
+      \node[left = 1 of a](s) {$S$};
+      \node[left = 1 of s] (l) {$L$};
+      \node[below = 1 of l] (u) {$U$};
+      \draw[-{Stealth[width=5pt]}, line width = .75] (a) to (y);
+      \draw[-{Stealth[width=5pt]}, line width = .75, out=30, in=150] (s) to (y);
+      \draw[-{Stealth[width=5pt]}, line width = .75, out=30, in=150] (l) to (y);
+      \draw[-{Stealth[width=5pt]}, line width = .75] (l) to (s);
+      \draw[-{Stealth[width=5pt]}, line width = .75,  bend left=-20] (l) to (a);
+    \draw[-{Stealth[width=5pt]}, line width = .75] (u) -- (l);
+    \draw[-{Stealth[width=5pt]}, line width = .75, bend left=-20] (u) to (y);
+      
+\end{tikzpicture} 
+\end{center}
+
+**Answer:**
+
+
+\newpage 
+
+## Modeling interactions (8 pt)
+
+You are interested in a hypothesized interaction between two exposures, arsenic and tobacco smoke\footnote{While the data used in this problem set are fake, a more rigorous overview of this issue can be found here: Chen, Y., Graziano, J. H., Parvez, F., Hussain, I., Momotaj, H., Van Geen, A., ... \& Ahsan, H. (2006). Modification of risk of arsenic-induced skin lesions by sunlight exposure, smoking, and occupational exposures in Bangladesh. Epidemiology, 459-467.}, on the incidence of skin lesions. Based on the literature you are fairly certain that exposure to arsenic in drinking water is a necessary cause of skin lesions, but believe that there may be significant interaction with other carcinogenic exposures like smoking. This data is found in the `arsenic.csv` file. At baseline you collect data on arsenic exposure (`arsenic`) from individual drinking sources and categorize them into "high" and "low" exposure categories. Likewise you ask participants whether they currently smoke (`smoker`) and record their current age (`age`). You then prospectively follow them and record who develops skin lesions (`lesions`).
+
+The assumption that the outcome is rare is reasonable here.
+
+1.  Test your hypothesis by fitting a statistical model with a multiplicative interaction involving arsenic and smoking exposure and adjusting for age.
+
+**CODE:**
+```{r interaction1, eval = TRUE}
+# Make sure eval = TRUE when knitting the assignment if using Rmd
+
+arsenic <- read.csv("arsenic.csv")
+
+m1 <- glm(lesions ~ arsenic + smoker + arsenic:smoker + age, data = arsenic, family = binomial) 
+
+summary(m1)
+
+```
+
+\newpage
+
+1a. Write out the model you have used. (1 pt)
+
+**Answer:**
+
+\vspace{1cm}
+
+
+1b. Calculate and **interpret** the estimate and a 95% confidence interval for the relevant interaction term. (2 pt)
+
+**Answer:**
+
+\vspace{1cm}
+
+
+1c. Does your analysis support this hypothesis? (1 pt)
+
+**Answer:**
+
+
+\vspace{1cm}
+
+
+2.  Calculate and **interpret** estimates and associated 95% CIs for the RERI and attributable proportion (i.e., the proportion of the outcome in the doubly exposed that is due to the interaction). (4 pt)
+
+Hint: Run the code in the `interaction_code.R` file (you can also use `source("interaction_code.R")` if you've saved the `interaction_code.R` file in your working directory) and then use the `additive_interactions()` function on your model result to get the these measures.
+
+
+**Code:**
+```{r}
+source("interaction_code.R")
+
+# now you'll just need to call the function and interpret the results
+# see the OSF repository for documentation and vignettes: https://osf.io/7ccpp/
+```
+
+```{r}
+m <- glm(lesions ~ arsenic + smoker + arsenic:smoker + age, data = arsenic, family = binomial) 
+rs <- additive_interactions(m, "lesions")
+```
+**Answer:**
+
+
+\newpage
+
+## Subgroup analysis (11 pt)
+
+In 2008, the state of Oregon expanded its Medicaid program to cover low-income residents who were previously uninsured. At the time, the waitlist to join the program was much larger than the number of available slots that the state could fund so officials held a lottery to determine which individuals on the waitlist would be offered slots. Selected adults won the opportunity to apply for Medicaid and to enroll if they met eligibility requirements. This lottery presented an opportunity to study the impact of Medicaid. In what became known as the "Oregon Health Insurance Experiment"\footnote{Baicker, K., Taubman, S., Allen, H., Bernstein, M., Gruber, J., Newhouse, J., ... Finkelstein, A. (2013). The Oregon Experiment — Effects of Medicaid on Clinical Outcomes. The New England Journal of Medicine, 368(18), 1713-1722.}, researchers used the random assignment during the expansion to study the causal effects of Medicaid on financial and health outcomes.
+
+In this section, you will be using a subset of the actual replication data from the OHIE to examine whether there are important or interesting interactions between Medicaid and other baseline variables.
+
+1.  Load the `ohie.csv` dataset and look over the codebook (`ohie_codebook.xlsx`). Identify an outcome (\textcolor{agreen}{highlighted in green}) that interests you and at least one baseline variable (\textcolor{blue}{highlighted in blue}) that you think could have an important statistical interaction with Medicaid assignment, the main exposure of interest (`treatment`). Run a regression to determine whether this is the case (*Note: you will be ignoring the significance level of the interaction term so you do not need to base your variable selection on the p-value*). Consider the type of outcome when specifying your regression model and use whatever scale (multiplicative or additive) you think is most relevant for the variables you chose.
+
+```{r}
+# insert your R code here to run the model
+# use summary(model) to see the estimated coefficients of your model
+# use confint(model) or the standard error provided in summary(model) 
+# to generate 95% confidence intervals for estimated coefficients
+```
+
+
+1a. Write out the model you used and report the estimate and 95% confidence interval for the interaction term. (1 pt)
+
+**Answer:**
+
+\vspace{1cm}
+
+
+1b. **Intepret** the interaction term. *Note: If selecting a categorical variable for interaction, provide interpretations all interaction coefficients. If using a logistic or log-linear model, you may interpret on the log-scale or exponentiated.* (1 pt)
+
+**Answer:**
+
+\vspace{1cm}
+
+
+2.  Do you think the relationship between Medicaid assignment and your chosen variable is a causal interaction or a heterogeneous effect? Explain which assumptions are necessary for it to be a causal interaction or a heterogeneous effect? Please define the assumptions using notation. Which is more likely? (5 pt) 
+
+**Answer:**
+
+\vspace{1cm}
+
+
+3.  Ignoring the statistical significance of the interaction term (i.e. assuming there is some sort of effect), draw a DAG showing this hypothesized relationship between Medicaid assignment, your outcome, and your baseline variable. Make sure to include any other relevant variables, measured or unmeasured.  (2 pt)
+
+**Answer:**
+
+
+\vspace{1cm}
+
+
+4.  If you were planning a follow up based on your result, would you target a different subpopulation or would you potentially attempt a more comprehensive program to intervene on both interaction variables? Why? (2 pt)
+
+**Answer:**
